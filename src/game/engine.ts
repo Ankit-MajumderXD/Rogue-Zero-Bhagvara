@@ -441,12 +441,12 @@ export class Game {
       this.startBoss();
       return;
     }
-    const def = WAVES[this.wave];
+    const def = WAVES[this.wave]!;
     const diff = 1 + this.wave * 0.22;
     let idx = 0;
     for (const s of def.spawns) {
       for (let i = 0; i < s.count; i++) {
-        const sp = this.arena.spawnPoints[(idx * 3 + i * 2) % this.arena.spawnPoints.length];
+        const sp = this.arena.spawnPoints[(idx * 3 + i * 2) % this.arena.spawnPoints.length]!;
         this.spawnEnemy(s.kind, sp, diff);
         idx++;
       }
@@ -1038,16 +1038,16 @@ export class Game {
 
     // Visor flash on damage
     const em = 3.2 + (this.hitFlash > 0 ? 4 : 0) + Math.sin(this.walkPhase) * 0.2;
-    this.zero.glowMats[0].emissiveIntensity = em;
-    this.zero.glowMats[0].color.setHex(this.hitFlash > 0 ? 0xff4a3c : 0x2ee6ff);
-    this.zero.glowMats[0].emissive.setHex(this.hitFlash > 0 ? 0xff4a3c : 0x2ee6ff);
+    this.zero.glowMats[0]!.emissiveIntensity = em;
+    this.zero.glowMats[0]!.color.setHex(this.hitFlash > 0 ? 0xff4a3c : 0x2ee6ff);
+    this.zero.glowMats[0]!.emissive.setHex(this.hitFlash > 0 ? 0xff4a3c : 0x2ee6ff);
     this.playerLight.position.copy(this.pos).setY(1.4);
   }
 
   private updateEnemies(dt: number) {
     const playerPos = this.pos;
     for (let i = this.enemies.length - 1; i >= 0; i--) {
-      const e = this.enemies[i];
+      const e = this.enemies[i]!;
       const g = e.rig.group;
 
       if (e.state === "DEAD") {
@@ -1079,14 +1079,14 @@ export class Game {
         e.state = e.stun > 0 ? "STUN" : "CHASE";
         e.vel.multiplyScalar(1 - Math.exp(-4 * dt));
         g.rotation.z = Math.sin(e.anim * 40) * 0.12;
-        e.rig.glowMats[0].emissiveIntensity = Math.random() > 0.5 ? 0.2 : 3;
+        e.rig.glowMats[0]!.emissiveIntensity = Math.random() > 0.5 ? 0.2 : 3;
         e.pos.addScaledVector(e.vel, dt);
         this.resolveObstacles(e.pos, e.radius);
         g.position.copy(e.pos);
         continue;
       }
       g.rotation.z = 0;
-      e.rig.glowMats[0].emissiveIntensity = e.flash > 0 ? 6 : 2.6;
+      e.rig.glowMats[0]!.emissiveIntensity = e.flash > 0 ? 6 : 2.6;
       for (const m of e.rig.bodyMats) {
         m.emissive.setHex(e.flash > 0 ? 0xffffff : 0x000000);
         m.emissiveIntensity = e.flash > 0 ? 0.9 : 0;
@@ -1294,7 +1294,7 @@ export class Game {
       if (b.atkT <= 0) {
         const options = ["BARRAGE", "SHOCK", "LASER", "CHARGE"];
         if (b.phase >= 2) options.push("SUMMON", "BARRAGE");
-        b.state = options[Math.floor(Math.random() * options.length)];
+        b.state = options[Math.floor(Math.random() * options.length)]!;
         b.stateT = b.state === "LASER" ? 2.6 : b.state === "CHARGE" ? 1.6 : b.state === "BARRAGE" ? 1.6 : 1.0;
         b.atkT = (b.phase === 3 ? 1.6 : 2.6) + Math.random();
         if (b.state === "CHARGE") b.charge.copy(dir);
@@ -1580,7 +1580,7 @@ export class Game {
     this.ventAcc += dt;
     if (this.ventAcc > 0.35 && this.arena.vents.length) {
       this.ventAcc = 0;
-      const v = this.arena.vents[Math.floor(Math.random() * this.arena.vents.length)];
+      const v = this.arena.vents[Math.floor(Math.random() * this.arena.vents.length)]!;
       this.fx.burst(v, {
         count: 3,
         color: Math.random() > 0.5 ? 0xffa63c : 0x8899aa,
