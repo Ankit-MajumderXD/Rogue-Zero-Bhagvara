@@ -12,3 +12,6 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Sitemap: https://rogue-zero-core.lovable.app/sitemap.xml
+

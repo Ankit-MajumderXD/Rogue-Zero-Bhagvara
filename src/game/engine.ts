@@ -913,8 +913,8 @@ export class Game {
     this.raycaster.setFromCamera(new THREE.Vector2(0, 0), this.camera);
     const hits = this.raycaster.intersectObjects([this.arena.group], true);
     this.aimPoint.copy(
-      hits.length && hits[0].distance < 120
-        ? hits[0].point
+      hits.length && hits[0]!.distance < 120
+        ? hits[0]!.point
         : this.camera.position.clone().addScaledVector(this.raycaster.ray.direction, 80),
     );
 
@@ -1525,7 +1525,7 @@ export class Game {
     this.raycaster.set(focus, dir.clone().normalize());
     this.raycaster.far = dist + 0.6;
     const hits = this.raycaster.intersectObject(this.arena.group, true);
-    if (hits.length) dist = Math.max(1.6, hits[0].distance - 0.5);
+    if (hits.length) dist = Math.max(1.6, hits[0]!.distance - 0.5);
     const camTarget = focus.clone().addScaledVector(dir, dist).setY(focus.y + dist * 0.16 + 0.3);
     this.camera.position.lerp(camTarget, 1 - Math.exp(-16 * dt));
 

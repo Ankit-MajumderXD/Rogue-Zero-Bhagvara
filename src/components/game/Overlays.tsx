@@ -44,9 +44,10 @@ export function Overlays({ game }: { game: Game | null }) {
         <div className="absolute inset-y-0 left-0 flex w-full max-w-2xl flex-col justify-center gap-8 px-14">
           <div>
             <div className="text-xs tracking-[0.6em] text-warning">EXPERIMENTAL COMBAT UNIT · 00</div>
-            <h1 className="mt-3 text-7xl leading-none tracking-[0.12em] text-foreground drop-shadow-[0_0_30px_rgba(46,230,255,0.35)]">
+            <h2 className="mt-3 text-7xl leading-none tracking-[0.12em] text-foreground drop-shadow-[0_0_30px_rgba(46,230,255,0.35)]">
               ROGUE<span className="text-accent"> ZERO</span>
-            </h1>
+            </h2>
+
             <p className="mt-3 text-sm tracking-[0.35em] text-muted-foreground">
               THE MACHINE THAT REFUSED TO DIE.
             </p>

@@ -18,16 +18,19 @@ export default function GameShell() {
   }, []);
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-background">
+    <main className="relative h-screen w-screen overflow-hidden bg-background">
+      <h1 className="sr-only">Rogue Zero — 3D Sci-Fi Roguelite Robot Arena Combat in the Browser</h1>
       <div ref={mount} className="absolute inset-0" />
       <Hud />
       <Overlays game={game} />
       <TouchControls game={game} />
+
       {s.screen === "PLAYING" && (
         <div className="pointer-events-none absolute bottom-1/2 left-1/2 hidden -translate-x-1/2 text-[10px] tracking-[0.3em] text-accent/70 md:block">
           {typeof document !== "undefined" && document.pointerLockElement ? "" : "CLICK TO CAPTURE MOUSE"}
         </div>
       )}
-    </div>
+    </main>
   );
 }
+

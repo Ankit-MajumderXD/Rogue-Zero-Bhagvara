@@ -68,7 +68,7 @@ export function rollUpgrades(count = 3): Upgrade[] {
   const pool = [...UPGRADES];
   const out: Upgrade[] = [];
   while (out.length < count && pool.length) {
-    out.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+    out.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]!);
   }
   return out;
 }

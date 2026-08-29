@@ -77,13 +77,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Rogue Zero" },
-      { name: "description", content: "3D sci-fi roguelite arena combat in the browser." },
-      { property: "og:title", content: "Rogue Zero" },
-      { property: "og:description", content: "3D sci-fi roguelite arena combat in the browser." },
+      { title: "Rogue Zero — 3D Sci-Fi Roguelite Combat", key: "title" },
+      {
+        name: "description",
+        content: "Rogue Zero: 3D sci-fi roguelite robot arena combat, playable in the browser.",
+        key: "description",
+      },
+      { property: "og:title", content: "Rogue Zero — 3D Sci-Fi Roguelite Combat", key: "og:title" },
+      {
+        property: "og:description",
+        content: "Rogue Zero: 3D sci-fi roguelite robot arena combat, playable in the browser.",
+        key: "og:description",
+      },
+      { property: "og:site_name", content: "Rogue Zero" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+
     links: [
       {
         rel: "stylesheet",
