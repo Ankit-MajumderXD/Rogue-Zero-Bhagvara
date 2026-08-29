@@ -1,24 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
+import GameShell from "@/components/game/GameShell";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  ssr: false, // WebGL canvas must never render on the server
+  head: () => ({
+    meta: [
+      { title: "Rogue Zero — 3D Sci-Fi Roguelite Arena Combat" },
+      {
+        name: "description",
+        content:
+          "Play Rogue Zero: pilot ZERO, an experimental combat robot, through reactor arenas of hostile machines, roguelite upgrades and the Warden boss fight.",
+      },
+      { property: "og:title", content: "Rogue Zero — The Machine That Refused To Die" },
+      {
+        property: "og:description",
+        content:
+          "A browser 3D third-person action roguelite: plasma rifle combat, energy blade, dash, EMP burst, enemy AI waves and a multi-phase boss.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: GameShell,
 });
-
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
