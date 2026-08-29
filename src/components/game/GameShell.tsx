@@ -30,6 +30,7 @@ export default function GameShell() {
           {typeof document !== "undefined" && document.pointerLockElement ? "" : "CLICK TO CAPTURE MOUSE"}
         </div>
       )}
-    </div>
+    </main>
   );
 }
+
