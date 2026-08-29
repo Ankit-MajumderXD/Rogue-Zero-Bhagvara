@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Fx } from "./fx";
-import { buildBossArena, buildReactorArena, type ArenaData } from "./arena";
+import { buildBossArena, buildReactorArena, type ArenaData, type Destructible } from "./arena";
 import { buildEnemy, buildWarden, buildZero, type EnemyKind, type Rig } from "./robots";
 import { MAT } from "./materials";
 import { hudStore, loadSave, persistSave, type Modifiers, type Upgrade } from "./store";
@@ -792,7 +792,7 @@ export class Game {
     }
   }
 
-  private hitDestructible(d: (typeof this.arena.destructibles)[number], dmg: number) {
+  private hitDestructible(d: Destructible, dmg: number) {
     if (d.dead) return;
     d.hp -= dmg;
     if (d.hp > 0) {
