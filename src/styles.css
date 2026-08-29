@@ -157,3 +157,11 @@
     color: var(--color-foreground);
   }
 }
+
+@layer base {
+  body {
+    font-family: var(--font-display);
+    overflow: hidden;
+    letter-spacing: 0.02em;
+  }
+}
