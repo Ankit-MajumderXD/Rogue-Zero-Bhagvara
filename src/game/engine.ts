@@ -457,6 +457,8 @@ export class Game {
     window.removeEventListener("keyup", this.onKeyUp);
     window.removeEventListener("mouseup", this.onMouseUp);
     document.removeEventListener("mousemove", this.onMouseMove);
+    window.removeEventListener("pointerdown", this.unlockAudio);
+    window.removeEventListener("keydown", this.unlockAudio);
     this.renderer.dispose();
     this.renderer.domElement.remove();
   }
