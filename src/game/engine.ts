@@ -1553,6 +1553,7 @@ export class Game {
           this.credits += 12;
           this.energy = Math.min(this.maxEnergy, this.energy + 6);
           this.fx.burst(s.pos.clone(), { count: 4, color: 0x7cf3ff, speed: 3, size: 0.06, life: 0.3 });
+          sfx.pickup();
           hudStore.set({ xp: this.xp, credits: this.credits });
         }
       }
