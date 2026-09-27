@@ -435,8 +435,10 @@ export class Game {
 
   dispose() {
     this.disposed = true;
+    this.runId++;
     cancelAnimationFrame(this.raf);
     sfx.stopAmbient();
+    sfx.stopMusic();
     window.removeEventListener("resize", this.onResize);
     window.removeEventListener("keydown", this.onKeyDown);
     window.removeEventListener("keyup", this.onKeyUp);
@@ -1286,6 +1288,7 @@ export class Game {
     }
     hudStore.set({ bossHp: Math.max(0, ratio) });
     if (this.boss.hp <= 0) {
+      this.phase = "OVER"; // stop wave logic immediately; victory screen follows
       const p = this.boss.pos.clone();
       this.fx.burst(p.clone().setY(4), { count: 60, color: 0xffa63c, speed: 16, size: 0.25, life: 1.6 });
       this.fx.ring(p.clone().setY(0.2), 22, 0xffa63c, 1.2);
