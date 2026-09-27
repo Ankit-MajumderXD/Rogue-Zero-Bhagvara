@@ -309,6 +309,7 @@ export class Game {
   // ---------- run lifecycle ----------
 
   startRun() {
+    this.runId++;
     this.mods = baseModifiers();
     this.owned = [];
     this.maxHp = 100;
@@ -321,6 +322,24 @@ export class Game {
     this.vy = 0;
     this.camYaw = Math.PI;
     this.camPitch = -0.1;
+    // Reset all transient combat state so restarts are clean.
+    this.keys.clear();
+    this.mouse.left = false;
+    this.mouse.right = false;
+    this.fireCd = 0;
+    this.meleeCd = 0;
+    this.meleeT = 0;
+    this.dashCd = 0;
+    this.dashT = 0;
+    this.empCd = 0;
+    this.invuln = 0;
+    this.recoil = 0;
+    this.hitFlash = 0;
+    this.regenAcc = 0;
+    this.shakeAmt = 0;
+    this.aiming = false;
+    if (this.zero.blade) this.zero.blade.visible = false;
+    this.zero.group.rotation.z = 0;
     this.clearEntities();
     this.loadArena(false);
     this.running = true;
@@ -341,6 +360,7 @@ export class Game {
     });
     sfx.unlock();
     sfx.startAmbient(false);
+    sfx.playMusic("game");
     sfx.alarm();
     const save = loadSave();
     persistSave({ ...save, runs: save.runs + 1 });
