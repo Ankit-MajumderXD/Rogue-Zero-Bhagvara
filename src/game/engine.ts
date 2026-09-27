@@ -170,6 +170,7 @@ export class Game {
 
   private keys = new Set<string>();
   private mouse = { left: false, right: false };
+  private runId = 0;
 
   constructor(container: HTMLElement) {
     this.container = container;

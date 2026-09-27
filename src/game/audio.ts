@@ -253,7 +253,9 @@ function startMusic(mode: MusicMode) {
     beat: 0,
     timer: setInterval(() => {
       if (!ctx || !music) return;
-      // Lookahead scheduler: stay ~0.35s ahead of the clock.
+      // Lookahead scheduler: stay ~0.35s ahead of the clock. If the context
+      // was suspended (autoplay policy), snap forward instead of bursting.
+      if (music.nextBeat < ctx.currentTime - 0.5) music.nextBeat = ctx.currentTime + 0.05;
       while (music.nextBeat < ctx.currentTime + 0.35) scheduleBeat(ctx, music);
     }, 120),
   };
