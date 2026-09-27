@@ -170,6 +170,7 @@ export class Game {
 
   private keys = new Set<string>();
   private mouse = { left: false, right: false };
+  private runId = 0;
 
   constructor(container: HTMLElement) {
     this.container = container;
@@ -211,6 +212,9 @@ export class Game {
     document.addEventListener("mousemove", this.onMouseMove);
     el.addEventListener("click", this.requestLock);
     el.addEventListener("contextmenu", (e) => e.preventDefault());
+    // Audio requires a user gesture; start the menu theme on the first one.
+    window.addEventListener("pointerdown", this.unlockAudio, { once: false });
+    window.addEventListener("keydown", this.unlockAudio, { once: false });
 
     this.clock.start();
     this.loop();
@@ -257,6 +261,16 @@ export class Game {
 
   private requestLock = () => {
     if (this.running && !this.paused) this.renderer.domElement.requestPointerLock?.();
+  };
+
+  private audioUnlocked = false;
+  private unlockAudio = () => {
+    if (this.audioUnlocked) return;
+    this.audioUnlocked = true;
+    sfx.unlock();
+    if (!this.running) sfx.playMusic("menu");
+    window.removeEventListener("pointerdown", this.unlockAudio);
+    window.removeEventListener("keydown", this.unlockAudio);
   };
 
   private onResize = () => {
@@ -308,6 +322,7 @@ export class Game {
   // ---------- run lifecycle ----------
 
   startRun() {
+    this.runId++;
     this.mods = baseModifiers();
     this.owned = [];
     this.maxHp = 100;
@@ -320,6 +335,24 @@ export class Game {
     this.vy = 0;
     this.camYaw = Math.PI;
     this.camPitch = -0.1;
+    // Reset all transient combat state so restarts are clean.
+    this.keys.clear();
+    this.mouse.left = false;
+    this.mouse.right = false;
+    this.fireCd = 0;
+    this.meleeCd = 0;
+    this.meleeT = 0;
+    this.dashCd = 0;
+    this.dashT = 0;
+    this.empCd = 0;
+    this.invuln = 0;
+    this.recoil = 0;
+    this.hitFlash = 0;
+    this.regenAcc = 0;
+    this.shakeAmt = 0;
+    this.aiming = false;
+    if (this.zero.blade) this.zero.blade.visible = false;
+    this.zero.group.rotation.z = 0;
     this.clearEntities();
     this.loadArena(false);
     this.running = true;
@@ -340,6 +373,7 @@ export class Game {
     });
     sfx.unlock();
     sfx.startAmbient(false);
+    sfx.playMusic("game");
     sfx.alarm();
     const save = loadSave();
     persistSave({ ...save, runs: save.runs + 1 });
@@ -364,14 +398,19 @@ export class Game {
   }
 
   toMenu() {
+    this.runId++;
     this.running = false;
     this.paused = false;
     this.phase = "IDLE";
+    this.keys.clear();
+    this.mouse.left = false;
+    this.mouse.right = false;
     this.clearEntities();
     this.loadArena(false);
     this.pos.set(6, 0, 20);
     this.camYaw = Math.PI - 0.4;
     sfx.stopAmbient();
+    sfx.playMusic("menu");
     document.exitPointerLock?.();
     hudStore.set({ screen: "MENU", bossName: null });
   }
@@ -382,6 +421,14 @@ export class Game {
     this.clearEntities();
     document.exitPointerLock?.();
     hudStore.set({ screen: "GARAGE" });
+  }
+
+  showSettings() {
+    this.running = false;
+    this.paused = false;
+    this.clearEntities();
+    document.exitPointerLock?.();
+    hudStore.set({ screen: "SETTINGS" });
   }
 
   chooseUpgrade(id: string) {
@@ -401,13 +448,17 @@ export class Game {
 
   dispose() {
     this.disposed = true;
+    this.runId++;
     cancelAnimationFrame(this.raf);
     sfx.stopAmbient();
+    sfx.stopMusic();
     window.removeEventListener("resize", this.onResize);
     window.removeEventListener("keydown", this.onKeyDown);
     window.removeEventListener("keyup", this.onKeyUp);
     window.removeEventListener("mouseup", this.onMouseUp);
     document.removeEventListener("mousemove", this.onMouseMove);
+    window.removeEventListener("pointerdown", this.unlockAudio);
+    window.removeEventListener("keydown", this.unlockAudio);
     this.renderer.dispose();
     this.renderer.domElement.remove();
   }
@@ -555,6 +606,7 @@ export class Game {
     this.phase = "FIGHT";
     sfx.stopAmbient();
     sfx.startAmbient(true);
+    sfx.playMusic("boss");
     sfx.alarm();
     hudStore.set({
       wave: WAVES.length + 1,
@@ -591,6 +643,7 @@ export class Game {
     this.phase = "OVER";
     this.running = false;
     sfx.stopAmbient();
+    sfx.playMusic("victory");
     document.exitPointerLock?.();
     const save = loadSave();
     persistSave({
@@ -608,6 +661,7 @@ export class Game {
     this.phase = "OVER";
     this.running = false;
     sfx.stopAmbient();
+    sfx.playMusic("defeat");
     sfx.explosion();
     document.exitPointerLock?.();
     const save = loadSave();
@@ -1249,6 +1303,7 @@ export class Game {
     }
     hudStore.set({ bossHp: Math.max(0, ratio) });
     if (this.boss.hp <= 0) {
+      this.phase = "OVER"; // stop wave logic immediately; victory screen follows
       const p = this.boss.pos.clone();
       this.fx.burst(p.clone().setY(4), { count: 60, color: 0xffa63c, speed: 16, size: 0.25, life: 1.6 });
       this.fx.ring(p.clone().setY(0.2), 22, 0xffa63c, 1.2);
@@ -1261,7 +1316,11 @@ export class Game {
       this.credits += 700;
       sfx.explosion();
       hudStore.set({ bossName: null, kills: this.kills });
-      setTimeout(() => this.victory(), 1600);
+      const id = this.runId;
+      setTimeout(() => {
+        // Guard: ignore if the player restarted or quit before the delay elapsed.
+        if (id === this.runId && this.phase === "OVER" && !this.disposed) this.victory();
+      }, 1600);
     }
   }
 
@@ -1494,6 +1553,7 @@ export class Game {
           this.credits += 12;
           this.energy = Math.min(this.maxEnergy, this.energy + 6);
           this.fx.burst(s.pos.clone(), { count: 4, color: 0x7cf3ff, speed: 3, size: 0.06, life: 0.3 });
+          sfx.pickup();
           hudStore.set({ xp: this.xp, credits: this.credits });
         }
       }
