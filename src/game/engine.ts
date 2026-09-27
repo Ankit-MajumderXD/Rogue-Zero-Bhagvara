@@ -626,6 +626,7 @@ export class Game {
     this.phase = "OVER";
     this.running = false;
     sfx.stopAmbient();
+    sfx.playMusic("victory");
     document.exitPointerLock?.();
     const save = loadSave();
     persistSave({
@@ -643,6 +644,7 @@ export class Game {
     this.phase = "OVER";
     this.running = false;
     sfx.stopAmbient();
+    sfx.playMusic("defeat");
     sfx.explosion();
     document.exitPointerLock?.();
     const save = loadSave();
@@ -1296,7 +1298,11 @@ export class Game {
       this.credits += 700;
       sfx.explosion();
       hudStore.set({ bossName: null, kills: this.kills });
-      setTimeout(() => this.victory(), 1600);
+      const id = this.runId;
+      setTimeout(() => {
+        // Guard: ignore if the player restarted or quit before the delay elapsed.
+        if (id === this.runId && this.phase === "OVER" && !this.disposed) this.victory();
+      }, 1600);
     }
   }
 
