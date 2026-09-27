@@ -385,14 +385,19 @@ export class Game {
   }
 
   toMenu() {
+    this.runId++;
     this.running = false;
     this.paused = false;
     this.phase = "IDLE";
+    this.keys.clear();
+    this.mouse.left = false;
+    this.mouse.right = false;
     this.clearEntities();
     this.loadArena(false);
     this.pos.set(6, 0, 20);
     this.camYaw = Math.PI - 0.4;
     sfx.stopAmbient();
+    sfx.playMusic("menu");
     document.exitPointerLock?.();
     hudStore.set({ screen: "MENU", bossName: null });
   }
@@ -403,6 +408,14 @@ export class Game {
     this.clearEntities();
     document.exitPointerLock?.();
     hudStore.set({ screen: "GARAGE" });
+  }
+
+  showSettings() {
+    this.running = false;
+    this.paused = false;
+    this.clearEntities();
+    document.exitPointerLock?.();
+    hudStore.set({ screen: "SETTINGS" });
   }
 
   chooseUpgrade(id: string) {
@@ -576,6 +589,7 @@ export class Game {
     this.phase = "FIGHT";
     sfx.stopAmbient();
     sfx.startAmbient(true);
+    sfx.playMusic("boss");
     sfx.alarm();
     hudStore.set({
       wave: WAVES.length + 1,
