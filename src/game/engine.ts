@@ -212,6 +212,9 @@ export class Game {
     document.addEventListener("mousemove", this.onMouseMove);
     el.addEventListener("click", this.requestLock);
     el.addEventListener("contextmenu", (e) => e.preventDefault());
+    // Audio requires a user gesture; start the menu theme on the first one.
+    window.addEventListener("pointerdown", this.unlockAudio, { once: false });
+    window.addEventListener("keydown", this.unlockAudio, { once: false });
 
     this.clock.start();
     this.loop();
@@ -258,6 +261,16 @@ export class Game {
 
   private requestLock = () => {
     if (this.running && !this.paused) this.renderer.domElement.requestPointerLock?.();
+  };
+
+  private audioUnlocked = false;
+  private unlockAudio = () => {
+    if (this.audioUnlocked) return;
+    this.audioUnlocked = true;
+    sfx.unlock();
+    if (!this.running) sfx.playMusic("menu");
+    window.removeEventListener("pointerdown", this.unlockAudio);
+    window.removeEventListener("keydown", this.unlockAudio);
   };
 
   private onResize = () => {
